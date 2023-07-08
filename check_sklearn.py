@@ -17,44 +17,19 @@ from tensorflow.python.keras import models
 import numpy as np
 
 
-def mlp_model(layers, units, dropout_rate, input_shape, num_classes):
-    """Creates an instance of a multi-layer perceptron model.
+#create a MLP model
+#with random values of choice
 
-    # Arguments
-        layers: int, number of `Dense` layers in the model.
-        units: int, output dimension of the layers.
-        dropout_rate: float, percentage of input to drop at Dropout layers.
-        input_shape: tuple, shape of input to the model.
-        num_classes: int, number of output classes.
+model = models.Sequential()
+model.add(Dense(512, activation='relu', input_shape=(10000,)))
+model.add(Dropout(0.5))
+model.add(Dense(512, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(46, activation='softmax'))
 
-    # Returns
-        An MLP model instance.
-    """
-    op_units, op_activation = _get_last_layer_units_and_activation(num_classes)
-    model = models.Sequential()
-    model.add(Dropout(rate=dropout_rate, input_shape=input_shape))
+#decalre an optimizer to adam
+optimizer = tf.keras.optimizers.Adam(lr=0.001)
 
-    for _ in range(layers-1):
-        model.add(Dense(units=units, activation='relu'))
-        model.add(Dropout(rate=dropout_rate))
+#compile the model
+model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.add(Dense(units=op_units, activation=op_activation))
-    return model
-
-
-#create a model with a basic NN (assume values for input/output)
-model = mlp_model(
-        layers=10,
-        units=5,
-        dropout_rate=0.2,
-        input_shape=x_train.shape[1:],
-        num_classes=2,
-    )
-
-model.compile(tf.keras.optimizers.SGD(), loss='mse')
-history = model.fit(np.arange(100).reshape(5, 20), np.zeros(5),
-                    epochs=10, verbose=1)
-print(history.params)
-
-# check the keys of history object
-print(history.history.keys())
