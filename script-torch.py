@@ -93,62 +93,6 @@ accuracies = {}
 #     lambda x: 1 if "unnecessary" in x else 0
 # )
 # copy the df and modify such that for those rows where the string value of labels column contains 'mandatory', set the label columnn to 1 else 0
-'''df_mandatory = df.copy()
-df_mandatory["mandatory"] = df_mandatory["labels"].apply(
-    lambda x: 1 if "mandatory" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'pharma', set the label columnn to 1 else 0
-df_pharma = df.copy()
-df_pharma["pharma"] = df_pharma["labels"].apply(lambda x: 1 if "pharma" in x else 0)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'conspiracy', set the label columnn to 1 else 0
-df_conspiracy = df.copy()
-df_conspiracy["conspiracy"] = df_conspiracy["labels"].apply(
-    lambda x: 1 if "conspiracy" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'political', set the label columnn to 1 else 0
-df_political = df.copy()
-df_political["political"] = df_political["labels"].apply(
-    lambda x: 1 if "political" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'country', set the label columnn to 1 else 0
-df_country = df.copy()
-df_country["country"] = df_country["labels"].apply(lambda x: 1 if "country" in x else 0)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'rushed', set the label columnn to 1 else 0
-df_rushed = df.copy()
-df_rushed["rushed"] = df_rushed["labels"].apply(lambda x: 1 if "rushed" in x else 0)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'ingredients', set the label columnn to 1 else 0
-df_ingredients = df.copy()
-df_ingredients["ingredients"] = df_ingredients["labels"].apply(
-    lambda x: 1 if "ingredients" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'side-effect', set the label columnn to 1 else 0
-df_side_effect = df.copy()
-df_side_effect["side-effect"] = df_side_effect["labels"].apply(
-    lambda x: 1 if "side-effect" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'ineffective', set the label columnn to 1 else 0
-df_ineffective = df.copy()
-df_ineffective["ineffective"] = df_ineffective["labels"].apply(
-    lambda x: 1 if "ineffective" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'religious', set the label columnn to 1 else 0
-df_religious = df.copy()
-df_religious["religious"] = df_religious["labels"].apply(
-    lambda x: 1 if "religious" in x else 0
-)
-
-# copy the df and modify such that for those rows where the string value of labels column contains 'none', set the label columnn to 1 else 0
-df_none = df.copy()
-df_none["none"] = df_none["labels"].apply(lambda x: 1 if "none" in x else 0)'''
 
 df_unnecessary = pd.read_csv("data/df_unnecessary.csv")
 df_mandatory = pd.read_csv("data/df_mandatory.csv")
@@ -407,28 +351,7 @@ def train_ngram_model(
 
     train_labels_list = train_labels.tolist()
 
-    '''misses = 0
-    print("training")
-    for ind, val in enumerate(train_labels_list):
-        if True:
-            first_row = x_val.toarray()[ind]
-            first_row_tensor = torch.tensor(first_row)
-
-            model.eval()
-            with torch.no_grad():
-                prediction = model.forward(first_row_tensor)
-            print('ac: ', train_labels_list[ind])
-            prediction = prediction.tolist().index(max(prediction.tolist()))
-            print('pr: ', prediction)
-            print('\n')
-
-            # if prediction != val:
-            #     misses += 1
-
-            # if ind > 1500:
-            #     break
-
-    print("misses", misses/1500)     '''
+   
 
     # model.eval()
     # with torch.no_grad():
