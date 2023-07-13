@@ -24,7 +24,7 @@ from torch.utils.data import DataLoader, TensorDataset
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from imblearn.over_sampling import SMOTE
+#from imblearn.over_sampling import SMOTE
 
 
 # %%
@@ -35,36 +35,6 @@ df.head()
 # %%
 # std defn
 num_classes = 2
-
-# %%
-import pandas as pd
-
-# Read the data
-data = pd.read_csv('data/train_val.csv')
-
-df_unnecessary = data.copy()
-df_unnecessary["unnecessary"] = df_unnecessary["labels"].apply(
-    lambda x: 1 if "unnecessary" in x else 0
-)
-
-# Filter rows where 'unnesecary' column is 1
-data_fil = df_unnecessary[df_unnecessary['unnecessary'] == 1]
-
-#repeat the rows 10 times
-data_fil = data_fil.loc[data_fil.index.repeat(5)]
-
-# Add the new rows to the original data
-df_unnecessary = pd.concat([df_unnecessary, data_fil])
-
-
-df_unnecessary = df_unnecessary.drop(columns=['labels'])
-
-print(df_unnecessary.head())
-
-#print the number of 1s in the column unnsecessary
-print(df_unnecessary['unnecessary'].value_counts())
-# Save the new data
-df_unnecessary.to_csv('data/df_unnecessary.csv', index=False)
 
 # %%
 # split data for each class
@@ -84,6 +54,7 @@ attr = [
 ]
 
 accuracies = {}
+training_accuracy = {}
 # split data for each class
 
 # copy the df and modify such that for those rows where the string value of labels column contains 'unnecessary', set the label columnn to 1 else 0
@@ -177,6 +148,16 @@ df_all = [
     df_religious,
     df_none,
 ]
+
+#shuffle each dataset in df_all
+for i in range(len(df_all)):
+    df_all[i] = df_all[i].sample(frac=1).reset_index(drop=True)
+
+
+# %%
+#print 5 positive and 5 negative samples from df_religious
+#for i in (df_religious.loc()):
+#    print(i) if (i['religious'] == 1) else (print(""))
 
 # %%
 def ngram_vectorize(train_texts, train_labels, val_texts):
@@ -305,7 +286,7 @@ def train_ngram_model(
     data,
     name,
     learning_rate=10e-3,
-    epochs=100,
+    epochs=10,
     batch_size=128,
     layers=2,
     units=64,
@@ -389,20 +370,21 @@ def train_ngram_model(
     accuracy = get_accuracy(model, x_val_tensor, y_val_tensor)
 
     # Print the accuracy.
-    print("Validation accuracy:", accuracy)
+    #print("Validation accuracy:", accuracy)
     accuracies[name] = accuracy
     torch.save(model.state_dict(), "models/model" + name + ".pt")
 
     #print the recall
-    print("recall", get_recall(model, x_val_tensor, y_val_tensor))
+    #print("recall", get_recall(model, x_val_tensor, y_val_tensor))
     
     #print the precision
-    print("precision", get_precision(model, x_val_tensor, y_val_tensor))
+    #print("precision", get_precision(model, x_val_tensor, y_val_tensor))
     
     #print the training accuracry
-    print("training accuracy", get_accuracy(model, x_train, train_tuple))
+    training_accuracy[name] = get_accuracy(model, x_train, train_tuple)
+    #print("training accuracy", get_accuracy(model, x_train, train_tuple))
     
-
+    #print("x_train_int[1]")
     first_row_tensor = torch.tensor(first_row)
 
     train_labels_list = train_labels.tolist()
@@ -417,11 +399,11 @@ def train_ngram_model(
             model.eval()
             with torch.no_grad():
                 prediction = model.forward(first_row_tensor)
-            print('ac: ', train_labels_list[ind])
+            #print('ac: ', train_labels_list[ind])
             prediction = prediction.tolist().index(max(prediction.tolist()))
-            print('pr: ', prediction)
-            print('\n')
-
+            #print('pr: ', prediction)
+            #print('\n')
+            pred_dict[name] = prediction
             # if prediction != val:
             #     misses += 1
 
@@ -441,9 +423,14 @@ def train_ngram_model(
 # 
 
 # %%
+global pred_dict
+pred_dict = {}
+for i in attr:
+    pred_dict[i] = []
+
 for ind, i in enumerate(df_all):
-    # Split the data into training and testing sets
-    #i, ind = df_all[0], 0
+    #Split the data into training and testing sets
+#i, ind = df_all[0], 0
     print(attr[ind])
     train_texts, val_texts, train_labels, val_labels = train_test_split(
         i.iloc[:, 1], i.iloc[:, -1], test_size=0.2, random_state=42
@@ -455,10 +442,14 @@ for ind, i in enumerate(df_all):
 # %%
 print(accuracies)
 print(attr)
+print(training_accuracy)
 
 # %% [markdown]
-# {'unnecessary': 0.9289672544080605, 'mandatory': 0.9385390428211587, 'pharma': 0.8876574307304785, 'conspiracy': 0.9486146095717884, 'political': 0.945088161209068, 'country': 0.981360201511335, 'rushed': 0.9007556675062972, 'ingredients': 0.9561712846347608, 'side-effect': 0.8382871536523929, 'ineffective': 0.8670025188916877, 'religious': 0.9944584382871536, 'none': 0.9445843828715366}
+# b4 augmentatoin: {'unnecessary': 0.9289672544080605, 'mandatory': 0.9385390428211587, 'pharma': 0.8876574307304785, 'conspiracy': 0.9486146095717884, 'political': 0.945088161209068, 'country': 0.981360201511335, 'rushed': 0.9007556675062972, 'ingredients': 0.9561712846347608, 'side-effect': 0.8382871536523929, 'ineffective': 0.8670025188916877, 'religious': 0.9944584382871536, 'none': 0.9445843828715366}
 # 
+# b4 shuffling: {'unnecessary': 0.9741411156261545, 'mandatory': 0.9847308488612836, 'pharma': 0.9718109339407744, 'conspiracy': 0.9867785405542843, 'political': 0.9804152902312412, 'country': 0.9956126606079598, 'rushed': 0.9667199148029819, 'ingredients': 0.9907146876758582, 'side-effect': 0.9472483604220131, 'ineffective': 0.9769481332999248, 'religious': 1.0, 'none': 0.987997175806072}
+# 
+# after double run: {'unnecessary': 0.5563626580575733, 'mandatory': 0.5667701863354038, 'pharma': 0.6264236902050114, 'conspiracy': 0.5580981439105009, 'political': 0.5792826805096744, 'country': 0.6756502663741774, 'rushed': 0.6280617678381256, 'ingredients': 0.6162070906021384, 'side-effect': 0.6501283147989735, 'ineffective': 0.5565021297920321, 'religious': 1.0, 'none': 0.5558955048246647}
 
 # %%
 import matplotlib.pyplot as plt
@@ -483,3 +474,121 @@ plt.show()
 # TODO: make traning parallel
 # TODO: account for data imbalance
 # TODO: ramp up epochs to max and take top 20k features again (change the df_min)
+
+# %%
+import matplotlib.pyplot as plt
+
+# plt.figure(figsize=(10, 7))
+x = range(len(training_accuracy))
+X = list(training_accuracy.keys())
+y = list(training_accuracy.values())
+plt.plot(X, y, marker='o')
+plt.xticks(x, X, rotation="vertical")
+plt.ylim([0, 1])
+for i in range(len(x)):
+    plt.text(x[i], y[i]-0.02, f'{y[i]:.4f}', ha='center', va='top', rotation='vertical')
+plt.show()
+plt.bar(X, y, color='red')
+plt.xticks(x, X, rotation="vertical")
+for i in range(len(x)):
+    plt.text(x[i], y[i]-0.02, f'{y[i]:.4f}', ha='center', va='top', rotation='vertical')
+plt.show()
+
+# %%
+pred = ["vaccines are unnessecary and cause autism"]
+
+# Vectorize the string
+x_train, pred = ngram_vectorize(df_all[0].iloc[:, 1], df_all[0].iloc[:, -1],pred)
+pred_int = int(pred.shape[0]), int(pred.shape[1])
+
+pred = pred.toarray()
+print(pred.shape)
+
+# # Calculate the number of zeros to add
+# desired_length = 2000
+# num_zeros = desired_length - pred.shape[0]
+
+# # Perform padding
+# padded_vector = np.pad(pred, ((0, num_zeros), (0, 0)), 'constant')
+
+# # Reshape the padded vector
+# reshaped_vector = padded_vector.reshape((desired_length, 1))
+
+# Load the model
+model = MLP(
+    layers=2,
+    units=64,
+    dropout_rate=0.2,
+    input_shape=2000,
+    num_classes=2,
+)
+
+model = nn.DataParallel(model)
+device = torch.device("cpu")
+model.to(device)
+
+# Load the weights
+model.load_state_dict(torch.load('models/modelunnecessary.pt'))
+
+# Convert the reshaped_vector to a tensor
+pred_tensor = torch.from_numpy(pred).float()
+
+# Feed the tensor into the model
+model.eval()
+with torch.no_grad():
+    prediction = model.forward(pred_tensor)
+
+# Print the prediction
+print(prediction.argmax().item())
+
+# %%
+
+
+# %%
+pred = ["vaccines are useful"]
+
+# Vectorize the string
+x_train, pred = ngram_vectorize(df_all[0].iloc[:, 1], df_all[0].iloc[:, -1],pred)
+pred_int = int(pred.shape[0]), int(pred.shape[1])
+
+pred = pred.toarray()
+print(pred.shape)
+
+# # Calculate the number of zeros to add
+# desired_length = 2000
+# num_zeros = desired_length - pred.shape[0]
+
+# # Perform padding
+# padded_vector = np.pad(pred, ((0, num_zeros), (0, 0)), 'constant')
+
+# # Reshape the padded vector
+# reshaped_vector = padded_vector.reshape((desired_length, 1))
+
+# Load the model
+model = MLP(
+    layers=2,
+    units=64,
+    dropout_rate=0.2,
+    input_shape=2000,
+    num_classes=2,
+)
+
+model = nn.DataParallel(model)
+device = torch.device("cpu")
+model.to(device)
+
+# Load the weights
+model.load_state_dict(torch.load('models/modelunnecessary.pt'))
+
+# Convert the reshaped_vector to a tensor
+pred_tensor = torch.from_numpy(pred).float()
+
+# Feed the tensor into the model
+model.eval()
+with torch.no_grad():
+    prediction = model.forward(pred_tensor)
+
+# Print the prediction
+print(prediction.argmax().item())
+
+
