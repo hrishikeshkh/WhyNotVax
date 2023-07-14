@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import re
 from sklearn.model_selection import train_test_split
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -29,7 +30,16 @@ def clean(text):
 df['tweet'] = df['tweet'].apply(clean)
 tweets = df['tweet'].values
 labels = df['labels'].values
+def clean(text):
+    # Remove "@" tags
+    text = re.sub(r'@\w+', '', text)
+    
+    # Remove emojis
+    text = emoji.get_emoji_regexp().sub('', text)
+    
+    return text
 
+df['tweet'] = df['tweet'].apply(clean)
 # Tokenize the tweets
 tokenizer = Tokenizer()
 tokenizer.fit_on_texts(tweets)
@@ -77,3 +87,4 @@ model.summary()
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f"Test Loss: {loss:.4f}")
 print(f"Test Accuracy: {accuracy:.4f}")
+
