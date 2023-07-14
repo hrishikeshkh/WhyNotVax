@@ -54,8 +54,8 @@ X_train, X_test, y_train, y_test = train_test_split(padded_sequences, encoded_la
 # Define the LSTM model
 model = Sequential()
 model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=max_length))
-model.add(Dropout(0.6))
-model.add(Conv1D(filters = 50, kernel_size = 20, padding='valid', activation='relu', strides=1))
+#model.add(Dropout(0.6))
+model.add(Conv1D(filters = 128, kernel_size = 4, padding='same', activation='relu', strides=1))
 #model.add(GlobalMaxPool1D())
 model.add(LSTM(128, activation='relu'))
 model.add(Dense(num_labels, activation='softmax'))
@@ -64,7 +64,7 @@ model.add(Dense(num_labels, activation='softmax'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Train the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=128)
+model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=50, batch_size=32)
 
 # Evaluate the model
 model.summary()
