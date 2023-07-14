@@ -14,13 +14,19 @@ df = pd.read_csv('data/train_val.csv')
 def clean(text):
     # Remove "@" tags
     text = re.sub(r'@\w+', '', text)
-    
-    # Remove emojis
-    text = emoji.get_emoji_regexp().sub('', text)
+    emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+         u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                            "]+", flags=re.UNICODE)
+    text= emoji_pattern.sub(r'', text)
+     # Remove emojis
+     #text = emoji.get_emoji_regexp().sub('', text)
     
     return text
 
-#df['tweet'] = df['tweet'].apply(clean)
+df['tweet'] = df['tweet'].apply(clean)
 tweets = df['tweet'].values
 labels = df['labels'].values
 
@@ -54,8 +60,8 @@ X_train, X_test, y_train, y_test = train_test_split(padded_sequences, encoded_la
 # Define the LSTM model
 model = Sequential()
 model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=max_length))
-#model.add(Dropout(0.6))
-model.add(Conv1D(filters = 128, kernel_size = 4, padding='same', activation='relu', strides=1))
+model.add(Dropout(0.6))
+model.add(Conv1D(filters = 50, kernel_size = 20, padding='valid', activation='relu', strides=1))
 #model.add(GlobalMaxPool1D())
 model.add(LSTM(128, activation='relu'))
 model.add(Dense(num_labels, activation='softmax'))
