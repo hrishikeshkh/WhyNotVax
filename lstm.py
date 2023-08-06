@@ -20,7 +20,7 @@ tokenizer.fit_on_texts(tweets)
 sequences = tokenizer.texts_to_sequences(tweets)
 
 # Pad sequences
-max_length = 100  # Define the maximum length of your input tweets
+max_length = 60  # Define the maximum length of your input tweets
 padded_sequences = pad_sequences(sequences, maxlen=max_length)
 
 all_labels = set()
