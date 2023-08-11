@@ -1,0 +1,6 @@
+clf_svm = OneVsRestClassifier(SVC(class_weight='balanced', kernel='linear', probability=True, random_state=42))
+# clf_svm.fit(X_train, y_train)
+# y_pred_svm = clf_svm.predict(X_test)
+# print("\nSupport Vector Machine Results:")
+# print(f"Accuracy: {accuracy_score(y_test, y_pred_svm):.4f}")
+# print(classification_report(y_test, y_pred_svm))

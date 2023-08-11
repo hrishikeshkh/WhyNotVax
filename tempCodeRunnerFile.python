@@ -1,0 +1,44 @@
+import random
+import multiprocessing
+
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    else:
+        pivot = arr[len(arr) // 2]
+        left = [x for x in arr if x < pivot]
+        middle = [x for x in arr if x == pivot]
+        right = [x for x in arr if x > pivot]
+        return quicksort(left) + middle + quicksort(right)
+
+def parallel_quicksort(arr):
+    num_processes = multiprocessing.cpu_count()
+    chunk_size = len(arr) // num_processes
+
+    # Split the array into chunks for each process
+    chunks = [arr[i:i+chunk_size] for i in range(0, len(arr), chunk_size)]
+
+    # Create processes and apply quicksort to each chunk
+    with multiprocessing.Pool(processes=num_processes) as pool:
+        sorted_chunks = pool.map(quicksort, chunks)
+
+    # Merge the sorted chunks
+    sorted_array = []
+    for chunk in sorted_chunks:
+        sorted_array.extend(chunk)
+
+    return sorted_array
+
+if __name__ == "__main__":
+    num_elements = int(input("Enter the number of elements: "))
+    lower_bound = int(input("Enter the lower bound for random numbers: "))
+    upper_bound = int(input("Enter the upper bound for random numbers: "))
+
+    # Generating a random array of elements between lower_bound and upper_bound
+    random_array = [random.randint(lower_bound, upper_bound) for _ in range(num_elements)]
+    print("Original array:")
+    print(random_array)
+
+    sorted_array = parallel_quicksort(random_array)
+    print("\nSorted array:")
+    print(sorted_array)

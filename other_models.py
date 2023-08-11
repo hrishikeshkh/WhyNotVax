@@ -1,3 +1,8 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.multiclass import OneVsRestClassifier
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -7,8 +12,8 @@ from keras.layers import Dense, Embedding, LSTM, GRU, Activation, Dropout, Globa
 from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Embedding
-import emoji ,re
 
+# ... [Your previous preprocessing code remains unchanged]
 df = pd.read_csv('data/train_val_cleaned.csv')
 
 tweets = df['tweet'].values
@@ -41,23 +46,28 @@ print(encoded_labels)
 # Split the data into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(padded_sequences, encoded_labels, test_size=0.2, random_state=42)
 
-# Define the LSTM model
-model = Sequential()
-model.add(Embedding(input_dim=len(tokenizer.word_index) + 1, output_dim=100, input_length=max_length))
-model.add(Dropout(0.6))
-model.add(Conv1D(filters = 50, kernel_size = 20, padding='valid', activation='relu', strides=2))
-#model.add(GlobalMaxPool1D())
-model.add(LSTM(128, activation='relu'))
-model.add(Dense(num_labels, activation='softmax'))
+# 
 
-# Compile the model
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+# 1. Decision Tree Classifier
+# clf_tree = DecisionTreeClassifier(random_state=42)
+# clf_tree.fit(X_train, y_train)
+# y_pred_tree = clf_tree.predict(X_test)
+# print("Decision Tree Classifier Results:")
+# print(f"Accuracy: {accuracy_score(y_test, y_pred_tree):.4f}")
+# print(classification_report(y_test, y_pred_tree))
 
-# Train the model
-model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=25, batch_size=64)
+# 2. Support Vector Machine with class weights
+clf_svm = OneVsRestClassifier(SVC(class_weight='balanced', kernel='linear', probability=True, random_state=42))
+clf_svm.fit(X_train, y_train)
+y_pred_svm = clf_svm.predict(X_test)
+print("\nSupport Vector Machine Results:")
+print(f"Accuracy: {accuracy_score(y_test, y_pred_svm):.4f}")
+print(classification_report(y_test, y_pred_svm))
 
-# Evaluate the model
-model.summary()
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f"Test Loss: {loss:.4f}")
-print(f"Test Accuracy: {accuracy:.4f}")
+# 3. Random Forest Classifier with class weights
+# clf_rf = RandomForestClassifier(class_weight='balanced', n_estimators=100, random_state=42)
+# clf_rf.fit(X_train, y_train)
+# y_pred_rf = clf_rf.predict(X_test)
+# print("\nRandom Forest Classifier Results:")
+# print(f"Accuracy: {accuracy_score(y_test, y_pred_rf):.4f}")
+# print(classification_report(y_test, y_pred_rf))
