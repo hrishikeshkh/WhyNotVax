@@ -15,6 +15,7 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score
 
 
 df = pd.read_csv("data/train_val.csv")
+pred_list = []
 
 num_classes = 2
 # split data for each class
@@ -168,11 +169,16 @@ def train_ngram_model(
     x_train, x_val = ngram_vectorize(train_texts, train_labels, val_texts)
 
     # Create model instance.
-    model = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
+    try: 
+        #load model from file 
+        model = torch.load("models/" + name + ".pt")
+    except:
+        model = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
 
     # Fit the model.
-    model.fit(x_train, train_labels)
-
+        model.fit(x_train, train_labels)
+        #save model 
+        torch.save(model, "models/" + name + ".pt")
     # Print 5 sample tweets and their labels.
     print("\nSample tweets for class attribute:", name)
     sample_indices = np.random.choice(len(val_texts), 5, replace=False) # Select 5 random samples
@@ -199,10 +205,27 @@ def train_ngram_model(
     # Print the precision
     print("precision", precision_score(val_labels, model.predict(x_val), average="macro"))
 
+from sklearn.metrics import accuracy_score
+
+def predict(model, train_texts, train_labels, val_texts):
+    # Vectorizing the text data using your custom ngram_vectorize function
+    x_val = ngram_vectorize(train_texts, train_labels, val_texts)[1]
+
+    # Predicting the validation labels
+    val_predictions = model.predict(x_val)
+
+    # Calculating the accuracy of the model on the validation data
+    return val_predictions
+
+
 global pred_dict
 pred_dict = {}
 #for i in attr:
     #pred_dict[i] = []
+
+#read test data
+df_val = pd.read_csv("test_data/test.csv")
+
 for ind, i in enumerate(df_all):
     #Split the data into training and testing sets
     #i, ind = df_all[0], 0
@@ -214,6 +237,20 @@ for ind, i in enumerate(df_all):
 
     train_ngram_model(data, name=attr[ind])
 
+    #make predictions
+    val_texts = df_val.iloc[:, 1]
+    #load relevant model
+    model = torch.load("models/" + attr[ind] + ".pt")
+    pred_list.append(predict(model, train_texts, train_labels, val_texts))
+
 print(accuracies)
 print(attr)
 print(training_accuracy)
+
+#add predictions to dataframe
+
+#save dataframe
+for j in range(len(pred_list[0])):
+    for i in range(len(pred_list)):
+        print(pred_list[i][j], end = " ")
+    print()
