@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Read the data
-data = pd.read_csv("data/train_val.csv")
+data = pd.read_csv("data/train_val_cleaned.csv")
 
 attr = [
     "unnecessary",
@@ -19,7 +19,7 @@ attr = [
     "none",
 ]
 
-factor = 6
+factor = 4
 
 df_unnecessary = data.copy()
 df_unnecessary["unnecessary"] = df_unnecessary["labels"].apply(
@@ -30,7 +30,7 @@ df_unnecessary["unnecessary"] = df_unnecessary["labels"].apply(
 data_fil = df_unnecessary[df_unnecessary["unnecessary"] == 1]
 
 # repeat the rows  2 * factor times
-data_fil = data_fil.loc[data_fil.index.repeat(2 * factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(2.7 * factor)]
 
 # Add the new rows to the original data
 df_unnecessary = pd.concat([df_unnecessary, data_fil])
@@ -54,7 +54,7 @@ df_mandatory["mandatory"] = df_mandatory["labels"].apply(
     lambda x: 1 if "mandatory" in x else 0
 )
 data_fil = df_mandatory[df_mandatory["mandatory"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(2 * factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(2.7 * factor)]
 df_mandatory = pd.concat([df_mandatory, data_fil])
 df_mandatory = df_mandatory.drop(columns=["labels"])
 print(df_mandatory.head())
@@ -65,7 +65,7 @@ df_mandatory.to_csv("data/df_mandatory.csv", index=False)
 df_pharma = data.copy()
 df_pharma["pharma"] = df_pharma["labels"].apply(lambda x: 1 if "pharma" in x else 0)
 data_fil = df_pharma[df_pharma["pharma"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(1.8 * factor)]
 df_pharma = pd.concat([df_pharma, data_fil])
 df_pharma = df_pharma.drop(columns=["labels"])
 print(df_pharma.head())
@@ -89,7 +89,7 @@ df_political["political"] = df_political["labels"].apply(
     lambda x: 1 if "political" in x else 0
 )
 data_fil = df_political[df_political["political"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(3 * factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(4 * factor)]
 df_political = pd.concat([df_political, data_fil])
 df_political = df_political.drop(columns=["labels"])
 print(df_political.head())
@@ -109,7 +109,7 @@ df_country.to_csv("data/df_country.csv", index=False)
 df_rushed = data.copy()
 df_rushed["rushed"] = df_rushed["labels"].apply(lambda x: 1 if "rushed" in x else 0)
 data_fil = df_rushed[df_rushed["rushed"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(1.6 * factor)]
 df_rushed = pd.concat([df_rushed, data_fil])
 df_rushed = df_rushed.drop(columns=["labels"])
 print(df_rushed.head())
@@ -133,7 +133,7 @@ df_side_effect["side-effect"] = df_side_effect["labels"].apply(
     lambda x: 1 if "side-effect" in x else 0
 )
 data_fil = df_side_effect[df_side_effect["side-effect"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(factor / 3)]
+data_fil = data_fil.loc[data_fil.index.repeat(factor / 1.5)]
 df_side_effect = pd.concat([df_side_effect, data_fil])
 df_side_effect = df_side_effect.drop(columns=["labels"])
 print(df_side_effect.head())
@@ -145,7 +145,7 @@ df_ineffective["ineffective"] = df_ineffective["labels"].apply(
     lambda x: 1 if "ineffective" in x else 0
 )
 data_fil = df_ineffective[df_ineffective["ineffective"] == 1]
-data_fil = data_fil.loc[data_fil.index.repeat(factor)]
+data_fil = data_fil.loc[data_fil.index.repeat(1.4 * factor)]
 df_ineffective = pd.concat([df_ineffective, data_fil])
 df_ineffective = df_ineffective.drop(columns=["labels"])
 print(df_ineffective.head())
