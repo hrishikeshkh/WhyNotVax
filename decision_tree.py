@@ -15,7 +15,6 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score
 from sklearn.model_selection import GridSearchCV
 
 
-df = pd.read_csv("data/train_val.csv")
 pred_list = []
 
 num_classes = 2
@@ -95,7 +94,7 @@ def ngram_vectorize(train_texts, train_labels, val_texts):
         "analyzer": TOKEN_MODE,  # Split text into word tokens.
         "min_df": MIN_DOCUMENT_FREQUENCY,
     }
-    vectorizer = TfidfVectorizer(**kwargs)
+    vectorizer = TfidfVectorizer()
 
     # Learn vocabulary from training texts and vectorize training texts.
     x_train = vectorizer.fit_transform(train_texts)
@@ -158,6 +157,35 @@ def get_precision(model, x_val, y_val):
 
     return precision
 
+def assign_classes(df, pred_list):
+    pred_list_transposed = list(zip(*pred_list))
+    
+    print("Length of pred_list:", len(pred_list))
+    print("Length of pred_list_transposed:", len(pred_list_transposed))
+    print("Number of rows in df_val:", len(df))
+    print("Sample of pred_list:", pred_list[:1])
+    print("Sample of df_val:", df.head())
+
+    if len(pred_list_transposed) != len(df):
+        raise ValueError("Length of pred_list must match the number of rows in the dataframe.")
+
+    classes = [
+        "unnecessary", "mandatory", "pharma", "conspiracy", "political",
+        "country", "rushed", "ingredients", "side_effect", "ineffective",
+        "religious", "none"
+    ]
+
+    def get_class_name(row_pred):
+        return ', '.join([class_name for idx, class_name in enumerate(classes) if row_pred[idx] == 1])
+
+    predicted_classes = [get_class_name(row) for row in pred_list_transposed]
+
+    result_df = pd.DataFrame({
+        'tweet': df['tweet'].iloc[:], # Adjusting to match the length
+        'predicted_class': predicted_classes
+    })
+
+    return result_df
 
 
 def train_ngram_model(
@@ -172,9 +200,11 @@ def train_ngram_model(
 ):
     # Get the data.
     (train_texts, train_labels), (val_texts, val_labels) = data
-
+    
     # Vectorize texts.
     x_train, x_val = ngram_vectorize(train_texts, train_labels, val_texts)
+    print("Training shape:", x_train.shape)
+    print("Validation shape:", x_val.shape)
 
     # Create model instance.
     try: 
@@ -255,6 +285,7 @@ for ind, i in enumerate(df_all):
     #load relevant model
     model = torch.load("models/" + attr[ind] + ".pt")
     pred_list.append(predict(model, train_texts, train_labels, val_texts))
+    
 print('\n')
 print('Total attributes',attr)
 print('\n')
@@ -265,7 +296,11 @@ print('\n')
 print('Precision',precision)
 print('\n')
 print('Recall',recall)
+result_df = assign_classes(df_val, pred_list)
 
+# You can then save or print the result_df as needed
+print(result_df.head())
+result_df.to_csv("predictions_with_classes.csv", index=False)
 #add predictions to dataframe
 
 #save dataframe

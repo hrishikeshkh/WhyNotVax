@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score
 from sklearn.model_selection import GridSearchCV
 
 
-df = pd.read_csv("data/train_val.csv")
+
 pred_list = []
 
 num_classes = 2
@@ -78,7 +78,7 @@ def ngram_vectorize(train_texts, train_labels, val_texts):
     NGRAM_RANGE = (1, 2)
 
     # Limit on the number of features. We use the top 20K features.
-    TOP_K = 20000
+    TOP_K = 10000
 
     # Whether text should be split into word or character n-grams.
     # One of 'word', 'char'.
