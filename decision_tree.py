@@ -12,6 +12,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, recall_score, precision_score
+from sklearn.model_selection import GridSearchCV
 
 
 df = pd.read_csv("data/train_val.csv")
@@ -36,6 +37,8 @@ attr = [
 
 accuracies = {}
 training_accuracy = {}
+precision = {}
+recall = {}
 
 df_unnecessary = pd.read_csv("data/df_unnecessary.csv")
 df_mandatory = pd.read_csv("data/df_mandatory.csv")
@@ -156,11 +159,16 @@ def get_precision(model, x_val, y_val):
     return precision
 
 
+
 def train_ngram_model(
     data,
     name,
     max_depth=None,
     random_state=None,
+    # min_samples_split=2,
+    # min_samples_leaf=1,
+    # criterion = 'entropy'
+    
 ):
     # Get the data.
     (train_texts, train_labels), (val_texts, val_labels) = data
@@ -173,10 +181,12 @@ def train_ngram_model(
         #load model from file 
         model = torch.load("models/" + name + ".pt")
     except:
-        model = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
+        # Create model instance.
+        model = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state, min_samples_split=2, min_samples_leaf=1, criterion = 'entropy')
 
-    # Fit the model.
+        # Fit the model.
         model.fit(x_train, train_labels)
+
         #save model 
         torch.save(model, "models/" + name + ".pt")
     # Print 5 sample tweets and their labels.
@@ -190,9 +200,12 @@ def train_ngram_model(
     # Compute accuracy.
     train_accuracy = accuracy_score(train_labels, model.predict(x_train))
     val_accuracy = accuracy_score(val_labels, model.predict(x_val))
-    
+    recall_1 = recall_score(val_labels, model.predict(x_val), average="macro")
+    precision_1 = precision_score(val_labels, model.predict(x_val), average="macro")
     accuracies[name] = val_accuracy
     training_accuracy[name] = train_accuracy
+    precision[name] = precision_1
+    recall[name] = recall_1
 
     
     # Print the accuracy
@@ -200,10 +213,10 @@ def train_ngram_model(
     print("Validation accuracy:", val_accuracy)
     
     # Print the recall
-    print("recall", recall_score(val_labels, model.predict(x_val), average="macro"))
+    print("recall", recall_1)
     
     # Print the precision
-    print("precision", precision_score(val_labels, model.predict(x_val), average="macro"))
+    print("precision", precision_1)
 
 from sklearn.metrics import accuracy_score
 
@@ -242,15 +255,21 @@ for ind, i in enumerate(df_all):
     #load relevant model
     model = torch.load("models/" + attr[ind] + ".pt")
     pred_list.append(predict(model, train_texts, train_labels, val_texts))
-
-print(accuracies)
-print(attr)
-print(training_accuracy)
+print('\n')
+print('Total attributes',attr)
+print('\n')
+print('Validation Accuracy',accuracies)
+print('\n')
+print('Training accuracy',training_accuracy)
+print('\n')
+print('Precision',precision)
+print('\n')
+print('Recall',recall)
 
 #add predictions to dataframe
 
 #save dataframe
-for j in range(len(pred_list[0])):
-    for i in range(len(pred_list)):
-        print(pred_list[i][j], end = " ")
-    print()
+# for j in range(len(pred_list[0])):
+#     for i in range(len(pred_list)):
+#         print(pred_list[i][j], end = " ")
+#     print()
