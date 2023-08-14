@@ -39,10 +39,10 @@ mlp_classifier = MLPClassifier(
 )
 
 param_grid = {
-    'base_estimator__hidden_layer_sizes': [(32,), (32, 64)],
-    'base_estimator__alpha' : [0.2, 0.3, 0.4],
+    'base_estimator__hidden_layer_sizes': [(32,), (32, 64), (64, 64), (32, 32, 32), (64, 64, 64), (32, 64, 32)],
+    'base_estimator__alpha' : [0.2, 0.5],
     #'base_estimator__learning_rate' : [0.0001, 0.0004],
-    'base_estimator__max_iter' : [20, 30]
+    'base_estimator__max_iter' : [100, 200, 500]
     # Add other hyperparameters as needed
 }
 
