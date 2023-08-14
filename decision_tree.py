@@ -71,43 +71,49 @@ df_all = [
 for i in range(len(df_all)):
     df_all[i] = df_all[i].sample(frac=1).reset_index(drop=True)
     
-def ngram_vectorize(train_texts, train_labels, val_texts):
-    # Vectorization parameters
-    # Range (inclusive) of n-gram sizes for tokenizing text.
-    NGRAM_RANGE = (1, 2)
+def ngram_vectorize(train_texts, train_labels, val_texts, name):
+    try:
+        # Try to load the saved vectorizer and selector
+        loaded_objects = torch.load("vectorizers/" + name + "_vectorizer.pt")
+        vectorizer = loaded_objects['vectorizer']
+        selector = loaded_objects['selector']
+    except:
+        # Vectorization parameters
+        NGRAM_RANGE = (1, 2)
+        TOP_K = 20000
+        TOKEN_MODE = "word"
+        MIN_DOCUMENT_FREQUENCY = 2
+        kwargs = {
+            "ngram_range": NGRAM_RANGE,
+            "dtype": np.float64,
+            "strip_accents": "unicode",
+            "decode_error": "replace",
+            "analyzer": TOKEN_MODE,
+            "min_df": MIN_DOCUMENT_FREQUENCY,
+        }
+        vectorizer = TfidfVectorizer(**kwargs)
 
-    # Limit on the number of features. We use the top 20K features.
-    TOP_K = 20000
+        # Learn vocabulary from training texts and vectorize training texts.
+        x_train = vectorizer.fit_transform(train_texts)
 
-    # Whether text should be split into word or character n-grams.
-    # One of 'word', 'char'.
-    TOKEN_MODE = "word"
+        # Select top 'k' of the vectorized features.
+        selector = SelectKBest(f_classif, k=min(TOP_K, x_train.shape[1]))
+        selector.fit(x_train, train_labels)
 
-    # Minimum document/corpus frequency below which a token will be discarded.
-    MIN_DOCUMENT_FREQUENCY = 2
-    # Create keyword arguments to pass to the 'tf-idf' vectorizer.
-    kwargs = {
-        "ngram_range": NGRAM_RANGE,  # Use 1-grams + 2-grams.
-        "dtype": np.float64,
-        "strip_accents": "unicode",
-        "decode_error": "replace",
-        "analyzer": TOKEN_MODE,  # Split text into word tokens.
-        "min_df": MIN_DOCUMENT_FREQUENCY,
-    }
-    vectorizer = TfidfVectorizer()
-
-    # Learn vocabulary from training texts and vectorize training texts.
-    x_train = vectorizer.fit_transform(train_texts)
+        # Save the vectorizer and selector
+        save_objects = {'vectorizer': vectorizer, 'selector': selector}
+        torch.save(save_objects, "vectorizers/" + name + "_vectorizer.pt")
+    else:
+        # If the vectorizer and selector are loaded, transform the training texts
+        x_train = vectorizer.transform(train_texts)
+        x_train = selector.transform(x_train).astype("float32")
 
     # Vectorize validation texts.
     x_val = vectorizer.transform(val_texts)
-    #x_pred = vectorizer.transform(pred_text)
-    # Select top 'k' of the vectorized features.
-    selector = SelectKBest(f_classif, k=min(TOP_K, x_train.shape[1]))
-    selector.fit(x_train, train_labels)
-    x_train = selector.transform(x_train).astype("float32")
     x_val = selector.transform(x_val).astype("float32")
     return x_train, x_val
+
+
 
 def get_accuracy(model, x_val, y_val):
     # Set the model to evaluation mode.
@@ -202,24 +208,19 @@ def train_ngram_model(
     (train_texts, train_labels), (val_texts, val_labels) = data
     
     # Vectorize texts.
-    x_train, x_val = ngram_vectorize(train_texts, train_labels, val_texts)
+    x_train, x_val = ngram_vectorize(train_texts, train_labels, val_texts, name)
     print("Training shape:", x_train.shape)
     print("Validation shape:", x_val.shape)
 
     # Create model instance.
     try: 
-        #load model from file 
-        model = torch.load("models/" + name + ".pt")
+        model = torch.load("models/" + name + "_model.pt")
     except:
-        # Create model instance.
         model = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state, min_samples_split=2, min_samples_leaf=1, criterion = 'entropy')
 
-        # Fit the model.
+        # Print 5 sample tweets and their labels.
         model.fit(x_train, train_labels)
 
-        #save model 
-        torch.save(model, "models/" + name + ".pt")
-    # Print 5 sample tweets and their labels.
     print("\nSample tweets for class attribute:", name)
     sample_indices = np.random.choice(len(val_texts), 5, replace=False) # Select 5 random samples
     for idx in sample_indices:
@@ -248,11 +249,15 @@ def train_ngram_model(
     # Print the precision
     print("precision", precision_1)
 
+    return model
+
 from sklearn.metrics import accuracy_score
 
-def predict(model, train_texts, train_labels, val_texts):
+def predict(model, train_texts, train_labels, val_texts, name):
     # Vectorizing the text data using your custom ngram_vectorize function
-    x_val = ngram_vectorize(train_texts, train_labels, val_texts)[1]
+    #set model to eval
+    model.eval()
+    x_val = ngram_vectorize(train_texts, train_labels, val_texts, name)[1]
 
     # Predicting the validation labels
     val_predictions = model.predict(x_val)
@@ -284,7 +289,7 @@ for ind, i in enumerate(df_all):
     val_texts = df_val.iloc[:, 1]
     #load relevant model
     model = torch.load("models/" + attr[ind] + ".pt")
-    pred_list.append(predict(model, train_texts, train_labels, val_texts))
+    pred_list.append(predict(model, train_texts, train_labels, val_texts, attr[ind]))
     
 print('\n')
 print('Total attributes',attr)
@@ -298,13 +303,13 @@ print('\n')
 print('Recall',recall)
 result_df = assign_classes(df_val, pred_list)
 
-# You can then save or print the result_df as needed
+#You can then save or print the result_df as needed
 print(result_df.head())
 result_df.to_csv("predictions_with_classes.csv", index=False)
 #add predictions to dataframe
 
 #save dataframe
-# for j in range(len(pred_list[0])):
-#     for i in range(len(pred_list)):
-#         print(pred_list[i][j], end = " ")
-#     print()
+for j in range(len(pred_list[0])):
+    for i in range(len(pred_list)):
+        print(pred_list[i][j], end = " ")
+    print()
