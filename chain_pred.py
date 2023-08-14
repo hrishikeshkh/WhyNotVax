@@ -56,7 +56,7 @@ mlp_classifier = MLPClassifier(
     solver="adam",
     alpha=0.5,
     learning_rate="constant",
-    max_iter=10,
+    max_iter=200,
 )
 
 # Create a Classifier Chain

@@ -53,7 +53,7 @@ chain = ClassifierChain(base_estimator=mlp_classifier, order='random', random_st
 #chain.fit(X_train_selected, y_train)
 
 
-grid_search = GridSearchCV(chain, param_grid, cv=5, n_jobs= -1) # cv=5 specifies 5-fold cross-validation
+grid_search = GridSearchCV(chain, param_grid, cv=5, n_jobs= -1, verbose=2) # cv=5 specifies 5-fold cross-validation
 
 # Fit the grid search to the data
 grid_search.fit(X_train_selected, y_train)
