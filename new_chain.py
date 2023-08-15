@@ -88,3 +88,28 @@ print(y_pred[:5])
 y_train_pred = chain.predict(X_train_selected)
 print("training ", chain.score(X_train_selected, y_train))
 print("testing ", chain.score(X_test_selected, y_test))
+
+df = pd.read_csv('data/super_clean.csv')
+
+
+def append_labels_and_drop_columns(df):
+    labels = ["conspiracy", "country", "ineffective", "ingredients", "mandatory", "none", "pharma", "political", "religious", "rushed", "side-effect", "unnecessary"]
+
+    # Function to find the labels corresponding to the one-hot encoded columns
+    def get_labels(row):
+        selected_labels = [label for label in labels if row[label] == 1]
+        return ', '.join(selected_labels[:3]) # Limit to 3 labels
+
+    # Apply the function to create the 'labels' column
+    df['labels'] = df.apply(get_labels, axis=1)
+
+    # Drop the one-hot encoded columns
+    df.drop(labels, axis=1, inplace=True)
+
+    return df
+
+
+df = append_labels_and_drop_columns(df)
+print(df)
+csv_file_path = 'data/processed_data.csv'
+df.to_csv(csv_file_path, index=False)
