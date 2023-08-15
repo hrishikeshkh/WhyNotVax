@@ -82,12 +82,12 @@ X_test_selected = feature_selector.transform(X_test_tfidf)
 
 # %%
 mlp_classifier = MLPClassifier(
-    hidden_layer_sizes=(32), 
+    hidden_layer_sizes=(64,64,64), 
     activation="relu",
     solver="adam",
-    alpha=0.1,
-    learning_rate="constant",
-    max_iter=200,
+    alpha=0.4,
+    learning_rate="adaptive",
+    max_iter=150,
 )
 
 nb_classifier = MultinomialNB()

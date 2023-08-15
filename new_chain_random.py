@@ -67,7 +67,7 @@ chain = ClassifierChain(base_estimator=mlp_classifier, order='random', random_st
 #chain.fit(X_train_selected, y_train)
 
 
-random_search = RandomizedSearchCV(chain, param_grid, n_iter=100, cv=3, n_jobs=-1, verbose=2, random_state=42)
+random_search = RandomizedSearchCV(chain, param_grid, n_iter=15, cv=3, n_jobs=-1, verbose=2, random_state=42)
 
 # Fit the grid search to the data
 random_search.fit(X_train_selected, y_train)
