@@ -11,7 +11,7 @@ from sklearn.model_selection import GridSearchCV
 
 # Assume X_text and y_multilabel are the text data and corresponding multi-label targets
 #Get the dataframe
-df = pd.read_csv('data/super_clean.csv')
+df = pd.read_csv('data/balanced_super_clean.csv')
 X_text = df['tweet']
 #acess these columns conspiracy,country,ineffective,ingredients,mandatory,none,pharma,political,religious,rushed,side-effect,unnecessary
 y_multilabel = df[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
@@ -19,13 +19,18 @@ y_multilabel = df[['conspiracy','country','ineffective','ingredients','mandatory
 # Split the data
 X_train_text, X_test_text, y_train, y_test = train_test_split(X_text, y_multilabel, random_state=42)
 
+df_test = pd.read_csv('data/super_clean.csv')
+df_filtered = df_test[~df_test['tweet'].isin(X_train_text)]
+X_test_text = df_filtered['tweet']
+y_test = df_filtered[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
+
 # Perform TF-IDF vectorization with unigrams and bigrams
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
 X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_text)
 X_test_tfidf = tfidf_vectorizer.transform(X_test_text)
 
 # Select the top 20k features using f_classif
-feature_selector = SelectKBest(chi2, k=min(20000, X_train_tfidf.shape[1]))
+feature_selector = SelectKBest(chi2, k=min(2000, X_train_tfidf.shape[1]))
 X_train_selected = feature_selector.fit_transform(X_train_tfidf, y_train)
 X_test_selected = feature_selector.transform(X_test_tfidf)
 
@@ -39,10 +44,10 @@ mlp_classifier = MLPClassifier(
 )
 
 param_grid = {
-    'base_estimator__hidden_layer_sizes': [(32, 64), (32, 64, 64)],
-    'base_estimator__alpha' : [0.2, 0.5],
+    'base_estimator__hidden_layer_sizes': [(32, 32), (32, 64), (32, 64, 64), (32, 128, 64), (64, 128, 64), (64, 128, 128), (128, 128, 128)],
+    'base_estimator__alpha' : [0.1, 0.2, 0.5],
     #'base_estimator__learning_rate' : [0.0001, 0.0004],
-    'base_estimator__max_iter' : [100, 500, 1000, 1500]
+    'base_estimator__max_iter' : [1000, 2000, 3000]
     # Add other hyperparameters as needed
 }
 
@@ -53,7 +58,7 @@ chain = ClassifierChain(base_estimator=mlp_classifier, order='random', random_st
 #chain.fit(X_train_selected, y_train)
 
 
-grid_search = GridSearchCV(chain, param_grid, cv=5, n_jobs= -1, verbose=2) # cv=5 specifies 5-fold cross-validation
+grid_search = GridSearchCV(chain, param_grid, cv=3, n_jobs= -1, verbose=2) # cv=5 specifies 5-fold cross-validation
 
 # Fit the grid search to the data
 grid_search.fit(X_train_selected, y_train)

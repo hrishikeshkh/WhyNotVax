@@ -8,6 +8,10 @@ import numpy as np
 import pandas as pd
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
+#import naive bayes classifier
+from sklearn.naive_bayes import MultinomialNB
+#import SVM
+from sklearn import svm
 
 # Assume X_text and y_multilabel are the text data and corresponding multi-label targets
 # Get the dataframe
@@ -39,6 +43,11 @@ X_train_text, X_test_text, y_train, y_test = train_test_split(
     X_text, y_multilabel, random_state=42
 )
 
+df_test = pd.read_csv('data/super_clean.csv')
+df_filtered = df_test[~df_test['tweet'].isin(X_train_text)]
+X_test_text = df_filtered['tweet']
+y_test = df_filtered[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
+
 # Perform TF-IDF vectorization with unigrams and bigrams
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
 X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_text)
@@ -51,16 +60,19 @@ X_test_selected = feature_selector.transform(X_test_tfidf)
 
 # %%
 mlp_classifier = MLPClassifier(
-    hidden_layer_sizes=(32, 64), 
+    hidden_layer_sizes=(128, 128, 128), 
     activation="relu",
     solver="adam",
     alpha=0.5,
-    learning_rate="constant",
-    max_iter=200,
+    learning_rate="adaptive",
+    max_iter=10,
 )
 
+nb_classifier = MultinomialNB()
+svm = svm.SVC()
+
 # Create a Classifier Chain
-chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42)
+chain = ClassifierChain(base_estimator=svm, order="random", random_state=42, verbose=True)
 
 # %%
 
