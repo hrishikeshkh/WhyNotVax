@@ -1,0 +1,11 @@
+Parameters: {'base_estimator__max_iter': 1, 'base_estimator__hidden_layer_sizes': 8, 'base_estimator__alpha': 0.1}
+Testing Accuracy: 0.02604647736327892
+
+Parameters: {'base_estimator__max_iter': 2, 'base_estimator__hidden_layer_sizes': 8, 'base_estimator__alpha': 0.1}
+Testing Accuracy: 0.0936674920239653
+
+Parameters: {'base_estimator__max_iter': 1, 'base_estimator__hidden_layer_sizes': 16, 'base_estimator__alpha': 0.1}
+Testing Accuracy: 0.08981862382845784
+
+Parameters: {'base_estimator__max_iter': 2, 'base_estimator__hidden_layer_sizes': 16, 'base_estimator__alpha': 0.1}
+Testing Accuracy: 0.04157535381744693

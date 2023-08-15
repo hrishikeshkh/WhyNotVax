@@ -12,6 +12,13 @@ from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import MultinomialNB
 #import SVM
 from sklearn import svm
+#imoport random forest
+from sklearn.ensemble import RandomForestClassifier
+#import knn
+from sklearn.neighbors import KNeighborsClassifier
+#import gradient boosting
+from sklearn.ensemble import GradientBoostingClassifier
+from nltk.corpus import stopwords
 
 # Assume X_text and y_multilabel are the text data and corresponding multi-label targets
 # Get the dataframe
@@ -38,6 +45,18 @@ y_multilabel = df[
 
 # %%
 
+#srop the stop words from X_text
+stop = stopwords.words('english')
+X_text = X_text.apply(lambda x: ' '.join([word for word in x.split() if word not in (stop)]))
+
+final_domain_specific_stop_words = [
+    "covid", "covid19", "vaccines", "virus", "people", "dont", "im", "just", "want", "need",
+    "inoculation", "immunization", "dose", "shot", "trial", "effect", "health", "risk", "trust",
+    "government", "rate", "death"
+]
+
+X_text = X_text.apply(lambda x: ' '.join([word for word in x.split() if word not in (final_domain_specific_stop_words)]))
+
 # Split the data
 X_train_text, X_test_text, y_train, y_test = train_test_split(
     X_text, y_multilabel, random_state=42
@@ -47,6 +66,9 @@ df_test = pd.read_csv('data/super_clean.csv')
 df_filtered = df_test[~df_test['tweet'].isin(X_train_text)]
 X_test_text = df_filtered['tweet']
 y_test = df_filtered[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
+
+
+
 
 # Perform TF-IDF vectorization with unigrams and bigrams
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
@@ -60,19 +82,22 @@ X_test_selected = feature_selector.transform(X_test_tfidf)
 
 # %%
 mlp_classifier = MLPClassifier(
-    hidden_layer_sizes=(128, 128, 128), 
+    hidden_layer_sizes=(32), 
     activation="relu",
     solver="adam",
-    alpha=0.5,
-    learning_rate="adaptive",
-    max_iter=10,
+    alpha=0.1,
+    learning_rate="constant",
+    max_iter=200,
 )
 
 nb_classifier = MultinomialNB()
 svm = svm.SVC()
+random_forest = RandomForestClassifier(n_estimators=5000, max_depth=30, random_state=42)
+knn = KNeighborsClassifier(n_neighbors=1000)
+gbc = GradientBoostingClassifier(n_estimators=300, learning_rate=0.1, max_depth=5, random_state=42)
 
 # Create a Classifier Chain
-chain = ClassifierChain(base_estimator=svm, order="random", random_state=42, verbose=True)
+chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42, verbose=True)
 
 # %%
 
