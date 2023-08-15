@@ -39,10 +39,10 @@ mlp_classifier = MLPClassifier(
 )
 
 param_grid = {
-    'base_estimator__hidden_layer_sizes': [(32,), (32, 64), (64, 64), (32, 32, 32), (64, 64, 64), (32, 64, 32)],
+    'base_estimator__hidden_layer_sizes': [(32, 64), (32, 64, 64)],
     'base_estimator__alpha' : [0.2, 0.5],
     #'base_estimator__learning_rate' : [0.0001, 0.0004],
-    'base_estimator__max_iter' : [100, 200, 500]
+    'base_estimator__max_iter' : [100, 500, 1000, 1500]
     # Add other hyperparameters as needed
 }
 
@@ -53,7 +53,7 @@ chain = ClassifierChain(base_estimator=mlp_classifier, order='random', random_st
 #chain.fit(X_train_selected, y_train)
 
 
-grid_search = GridSearchCV(chain, param_grid, cv=5, n_jobs= -1) # cv=5 specifies 5-fold cross-validation
+grid_search = GridSearchCV(chain, param_grid, cv=5, n_jobs= -1, verbose=2) # cv=5 specifies 5-fold cross-validation
 
 # Fit the grid search to the data
 grid_search.fit(X_train_selected, y_train)
@@ -61,6 +61,18 @@ grid_search.fit(X_train_selected, y_train)
 # Get the best parameters and estimator
 best_params = grid_search.best_params_
 best_estimator = grid_search.best_estimator_
+
+#save the best onto a file
+with open('best_params.txt', 'w') as f:
+    f.write(str(best_params))
+    f.write('\n')
+    f.write(str(best_estimator))
+
+#also store it on a binary
+import pickle
+with open('best_params.bin', 'wb') as f:
+    pickle.dump(best_params, f)
+    pickle.dump(best_estimator, f)
 
 y_pred = chain.predict(X_test_selected)
 
