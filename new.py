@@ -26,7 +26,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "country": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -34,7 +34,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "ineffective": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -42,7 +42,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "ingredients": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -50,7 +50,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "mandatory": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -58,7 +58,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "none": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -66,7 +66,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "pharma": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -74,7 +74,7 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "political": {
         "hidden_layer_sizes": (64, 64, 64),
@@ -82,39 +82,39 @@ hyperparameters_per_class = {
         "solver": "adam",
         "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "religious": {
         "hidden_layer_sizes": (64, 64, 64),
         "activation": "relu",
         "solver": "adam",
-        "alpha": 0.1,
+        "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "rushed": {
         "hidden_layer_sizes": (64, 64, 64),
         "activation": "relu",
         "solver": "adam",
-        "alpha": 1,
+        "alpha": 0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "side-effect": {
         "hidden_layer_sizes": (64, 64, 64),
         "activation": "relu",
         "solver": "adam",
-        "alpha":1,
+        "alpha":0.3,
         "learning_rate": "constant",
-        "max_iter": 5,
+        "max_iter": 100,
     },
     "unnecessary": {
         "hidden_layer_sizes": (64, 64, 64),
         "activation": "relu",
         "solver": "adam",
         "learning_rate": "constant",
-        "alpha": 0.1,
-        "max_iter": 5,
+        "alpha": 0.3,
+        "max_iter": 100,
     },# Add more class-specific hyperparameters here
 }
 
