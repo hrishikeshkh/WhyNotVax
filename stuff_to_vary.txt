@@ -1,0 +1,6 @@
+n gram
+no of ft (uptil 17k)
+all usual stuff
+with and without stremming-thing
+
+diff hyperparam for each class duh

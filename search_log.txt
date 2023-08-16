@@ -1,11 +1,30 @@
-Parameters: {'base_estimator__max_iter': 1, 'base_estimator__hidden_layer_sizes': 8, 'base_estimator__alpha': 0.1}
-Testing Accuracy: 0.02604647736327892
+Parameters: {'base_estimator__max_iter': 100, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (32, 64, 64), 'base_estimator__alpha': 0.4}
+Testing Accuracy: 0.4474462365591398
 
-Parameters: {'base_estimator__max_iter': 2, 'base_estimator__hidden_layer_sizes': 8, 'base_estimator__alpha': 0.1}
-Testing Accuracy: 0.0936674920239653
+Parameters: {'base_estimator__max_iter': 50, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 128), 'base_estimator__alpha': 0.4}
+Testing Accuracy: 0.4432795698924731
 
-Parameters: {'base_estimator__max_iter': 1, 'base_estimator__hidden_layer_sizes': 16, 'base_estimator__alpha': 0.1}
-Testing Accuracy: 0.08981862382845784
+Parameters: {'base_estimator__max_iter': 100, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.5}
+Testing Accuracy: 0.4452956989247312
 
-Parameters: {'base_estimator__max_iter': 2, 'base_estimator__hidden_layer_sizes': 16, 'base_estimator__alpha': 0.1}
-Testing Accuracy: 0.04157535381744693
+Parameters: {'base_estimator__max_iter': 500, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (32, 32, 32), 'base_estimator__alpha': 0.2}
+Testing Accuracy: 0.4376344086021505
+
+Parameters: {'base_estimator__max_iter': 200, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (32, 32, 32), 'base_estimator__alpha': 0.4}
+Testing Accuracy: 0.443010752688172
+
+Parameters: {'base_estimator__max_iter': 100, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 128), 'base_estimator__alpha': 0.1}
+Testing Accuracy: 0.4317204301075269
+
+Parameters: {'base_estimator__max_iter': 100, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.4}
+Testing Accuracy: 0.4452956989247311
+
+Parameters: {'base_estimator__max_iter': 500, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64), 'base_estimator__alpha': 0.2}
+Testing Accuracy: 0.4442204301075269
+
+Parameters: {'base_estimator__max_iter': 50, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.4}
+Testing Accuracy: 0.4438172043010753
+
+Parameters: {'base_estimator__max_iter': 200, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.5}
+Testing Accuracy: 0.448252688172043
+

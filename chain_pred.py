@@ -76,46 +76,47 @@ X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_text)
 X_test_tfidf = tfidf_vectorizer.transform(X_test_text)
 
 # Select the top 20k features (if available)
-feature_selector = SelectKBest(chi2, k=min(20000, X_train_tfidf.shape[1]))
-X_train_selected = feature_selector.fit_transform(X_train_tfidf, y_train)
-X_test_selected = feature_selector.transform(X_test_tfidf)
+for i in range(2000, 20000, 2000):
+    feature_selector = SelectKBest(chi2, k=min(i, X_train_tfidf.shape[1]))
+    X_train_selected = feature_selector.fit_transform(X_train_tfidf, y_train)
+    X_test_selected = feature_selector.transform(X_test_tfidf)
 
-# %%
-mlp_classifier = MLPClassifier(
-    hidden_layer_sizes=(64,64,64), 
-    activation="relu",
-    solver="adam",
-    alpha=0.4,
-    learning_rate="adaptive",
-    max_iter=150,
-)
+    # %%
+    mlp_classifier = MLPClassifier(
+        hidden_layer_sizes=(64,64,64), 
+        activation="relu",
+        solver="adam",
+        alpha=0.1,
+        learning_rate="adaptive",
+        max_iter=200,
+    )
 
-nb_classifier = MultinomialNB()
-svm = svm.SVC()
-random_forest = RandomForestClassifier(n_estimators=5000, max_depth=30, random_state=42)
-knn = KNeighborsClassifier(n_neighbors=1000)
-gbc = GradientBoostingClassifier(n_estimators=300, learning_rate=0.1, max_depth=5, random_state=42)
+    nb_classifier = MultinomialNB()
+    #svm = svm.SVC()
+    #random_forest = RandomForestClassifier(n_estimators=5000, max_depth=30, random_state=42)
+    #knn = KNeighborsClassifier(n_neighbors=1000)
+    #gbc = GradientBoostingClassifier(n_estimators=300, learning_rate=0.1, max_depth=5, random_state=42)
 
-# Create a Classifier Chain
-chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42, verbose=True)
+    # Create a Classifier Chain
+    chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42, verbose=True)
 
-# %%
+    # %%
 
-# Fit the chain on the training data
-chain.fit(X_train_selected, y_train)
+    # Fit the chain on the training data
+    chain.fit(X_train_selected, y_train)
 
-# %%
+    # %%
 
-# Predict on the test data
-y_pred = chain.predict(X_test_selected)
+    # Predict on the test data
+    y_pred = chain.predict(X_test_selected)
 
-# Now, y_pred contains the multi-label predictions
-print(y_pred[:5])
+    # Now, y_pred contains the multi-label predictions
+    print(y_pred[:5])
 
-# Get the score
-y_train_pred = chain.predict(X_train_selected)
-print("training ", chain.score(X_train_selected, y_train))
-print("testing ", chain.score(X_test_selected, y_test))
+    # Get the score
+    y_train_pred = chain.predict(X_train_selected)
+    print("training with ", i, " features", chain.score(X_train_selected, y_train))
+    print("testing with", i, " features ", chain.score(X_test_selected, y_test))
 
 # %%
 

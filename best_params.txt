@@ -1,5 +1,4 @@
-{'base_estimator__max_iter': 100, 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.1}
-ClassifierChain(base_estimator=MLPClassifier(alpha=0.1,
-                                             hidden_layer_sizes=(64, 64, 64),
-                                             max_iter=100),
+{'base_estimator__max_iter': 200, 'base_estimator__learning_rate': 'constant', 'base_estimator__hidden_layer_sizes': (64, 64, 64), 'base_estimator__alpha': 0.5}
+ClassifierChain(base_estimator=MLPClassifier(alpha=0.5,
+                                             hidden_layer_sizes=(64, 64, 64)),
                 order='random', random_state=42)

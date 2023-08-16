@@ -12,7 +12,7 @@ from sklearn.model_selection import RandomizedSearchCV
 
 # Assume X_text and y_multilabel are the text data and corresponding multi-label targets
 #Get the dataframe
-df = pd.read_csv('data/balanced_super_clean.csv')
+df = pd.read_csv('data/super_clean.csv')
 X_text = df['tweet']
 #acess these columns conspiracy,country,ineffective,ingredients,mandatory,none,pharma,political,religious,rushed,side-effect,unnecessary
 y_multilabel = df[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
@@ -20,11 +20,11 @@ y_multilabel = df[['conspiracy','country','ineffective','ingredients','mandatory
 # Split the data
 X_train_text, X_test_text, y_train, y_test = train_test_split(X_text, y_multilabel, random_state=42)
 
-df_test = pd.read_csv('data/super_clean.csv')
+'''df_test = pd.read_csv('data/super_clean.csv')
 df_filtered = df_test[~df_test['tweet'].isin(X_train_text)]
 X_test_text = df_filtered['tweet']
 y_test = df_filtered[['conspiracy','country','ineffective','ingredients','mandatory','none','pharma','political','religious','rushed','side-effect','unnecessary']]
-
+'''
 # Perform TF-IDF vectorization with unigrams and bigrams
 tfidf_vectorizer = TfidfVectorizer(ngram_range=(1, 2))
 X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_text)
@@ -53,10 +53,10 @@ mlp_classifier = MLPClassifier(
 # }
 
 param_grid = {
-    'base_estimator__hidden_layer_sizes': [(32), (32, 32), (32, 64), (64, 64), (32, 32, 32), (32, 64, 32), (64, 64, 64), (32, 64, 64), (64, 64, 128), (64, 128, 128), (128, 128, 128)],
+    'base_estimator__hidden_layer_sizes': [(32, 32), (32, 64), (64, 64), (32, 32, 32), (32, 64, 32), (64, 64, 64), (32, 64, 64), (64, 64, 128), (64, 128, 128), (128, 128, 128)],
     'base_estimator__alpha' : [0.1, 0.2, 0.4, 0.5],
-    #'base_estimator__learning_rate' : [0.0001, 0.0004],
-    'base_estimator__max_iter' : [100, 200, 500, 1000, 2000]
+    'base_estimator__learning_rate' : ['constant'],
+    'base_estimator__max_iter' : [50, 100, 200, 500]
     # Add other hyperparameters as needed
 }
 
@@ -67,10 +67,17 @@ chain = ClassifierChain(base_estimator=mlp_classifier, order='random', random_st
 #chain.fit(X_train_selected, y_train)
 
 
-random_search = RandomizedSearchCV(chain, param_grid, n_iter=15, cv=3, n_jobs=-1, verbose=2, random_state=42)
+random_search = RandomizedSearchCV(chain, param_grid, n_iter=10, cv=5, n_jobs=-1, verbose=2, random_state=42)
 
 # Fit the grid search to the data
 random_search.fit(X_train_selected, y_train)
+
+with open('search_log.txt', 'w') as log_file:
+    # Iterate through the results
+    for params, test_score in zip(random_search.cv_results_['params'], random_search.cv_results_['mean_test_score']):
+        # Log the details
+        log_file.write(f"Parameters: {params}\n")
+        log_file.write(f"Testing Accuracy: {test_score}\n\n")
 
 # Open the log file to write
 # Get the best parameters and estimator
