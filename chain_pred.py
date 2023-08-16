@@ -78,7 +78,7 @@ X_test_tfidf = tfidf_vectorizer.transform(X_test_text)
 
 # Select the top 20k features (if available)
 #for i in range(2000, 20000, 2000):
-feature_selector = SelectKBest(chi2, k=min(15000, X_train_tfidf.shape[1]))
+feature_selector = SelectKBest(chi2, k=min(20000, X_train_tfidf.shape[1]))
 X_train_selected = feature_selector.fit_transform(X_train_tfidf, y_train)
 X_test_selected = feature_selector.transform(X_test_tfidf)
 
@@ -87,9 +87,9 @@ mlp_classifier = MLPClassifier(
     hidden_layer_sizes=(64,64,64), 
     activation="relu",
     solver="adam",
-    alpha=0.1,
+    alpha=0.3,
     learning_rate="adaptive",
-    max_iter=200,
+    max_iter=100,
 )
 
 nb_classifier = MultinomialNB()

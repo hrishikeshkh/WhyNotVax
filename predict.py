@@ -44,6 +44,10 @@ final_domain_specific_stop_words = [
 X_text_val = X_text_val.apply(lambda x: ' '.join([word for word in x.split() if word not in (final_domain_specific_stop_words)]))
 
 
+
+# acess these columns conspiracy,country,ineffective,ingredients,mandatory,none,pharma,political,religious,rushed,side-effect,unnecessary
+
+# %%
 df = pd.read_csv("data/super_clean.csv")
 X_text = df["tweet"]
 # acess these columns conspiracy,country,ineffective,ingredients,mandatory,none,pharma,political,religious,rushed,side-effect,unnecessary
@@ -77,6 +81,7 @@ final_domain_specific_stop_words = [
 ]
 
 X_text = X_text.apply(lambda x: ' '.join([word for word in x.split() if word not in (final_domain_specific_stop_words)]))
+
 
 # Split the data
 '''
