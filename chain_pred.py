@@ -88,7 +88,7 @@ mlp_classifier = MLPClassifier(
     activation="relu",
     solver="adam",
     alpha=0.3,
-    learning_rate="adaptive",
+    learning_rate="constant",
     max_iter=100,
 )
 
