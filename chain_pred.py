@@ -98,7 +98,7 @@ for i in range(2000, 20000, 2000):
     #gbc = GradientBoostingClassifier(n_estimators=300, learning_rate=0.1, max_depth=5, random_state=42)
 
     # Create a Classifier Chain
-    chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42, verbose=True)
+    chain = ClassifierChain(base_estimator=mlp_classifier, order="random", random_state=42)
 
     # %%
 
